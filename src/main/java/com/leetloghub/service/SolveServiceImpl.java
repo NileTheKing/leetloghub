@@ -25,7 +25,7 @@ public class SolveServiceImpl implements SolveService {
         String commitMessage = "Solve: " + problemTitle;
         String filePath = directoryPath + "/" + problemTitle.replaceAll("[^a-zA-Z0-9.-]", "_") + ".java";
         githubService.commitCode(
-                member.getEncryptedGithubToken(), // This will need decryption
+                member.getAccessTokenGithub(), // This will need decryption
                 member.getTargetRepo(),
                 filePath,
                 code,
@@ -34,7 +34,7 @@ public class SolveServiceImpl implements SolveService {
 
         // 2. Create Notion Page
         notionService.createPageInDatabase(
-                member.getEncryptedNotionToken(), // This will need decryption
+                member.getAccessTokenNotion(), // This will need decryption
                 member.getTargetDbId(),
                 problemTitle
         );
