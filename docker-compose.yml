@@ -1,0 +1,25 @@
+services:
+  # 서비스 이름 (db, postgres 등 자유롭게 지정 가능)
+  db:
+    # 사용할 Docker 이미지
+    image: postgres:16
+    
+    # 컨테이너 재시작 정책: 항상 재시작
+    restart: always
+    
+    # 컨테이너의 환경 변수 설정
+    environment:
+      POSTGRES_USER: nile      # PostgreSQL 사용자 이름
+      POSTGRES_PASSWORD: dksk1234  # PostgreSQL 비밀번호
+      POSTGRES_DB: leethublog        # 생성할 데이터베이스 이름
+      
+    # 포트 매핑 (호스트 포트:컨테이너 포트)
+    # 로컬 PC의 5432 포트를 컨테이너의 5432 포트와 연결
+    ports:
+      - "5432:5432"
+      
+    # 볼륨 설정 (데이터 영속성)
+    # 컨테이너가 삭제되어도 데이터베이스 데이터는 로컬에 보존됨
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
