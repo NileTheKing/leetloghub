@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: leetloghub-postgres
+    environment:
+      # 이 값들은 아래 application.properties의 username/password와 일치해야 합니다.
+      POSTGRES_USER: nile
+      POSTGRES_PASSWORD: dksk1234
+      POSTGRES_DB: leetloghub
+    ports:
+      # 로컬 PC의 5432 포트와 컨테이너의 5432 포트를 연결합니다.
+      - "5432:5432"
+    volumes:
+      # 컨테이너를 삭제해도 데이터가 보존되도록 설정합니다.
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

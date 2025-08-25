@@ -13,5 +13,5 @@ public class GithubAPIController {
     // - Handling webhooks for repository events
 
     // Placeholder for future implementation
-    @GetMapping()
+
 }
