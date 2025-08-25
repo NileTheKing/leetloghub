@@ -22,14 +22,9 @@ public class GithubAuthController {
 
     @Value("${github.client.id}")
     private String clientId;
+
     @Value("${github.client.secret}")
     private String clientSecret;
-    @Value("${github.url.authorize}")
-    private String authorizeUrl;
-    @Value("${github.url.token}")
-    private String tokenUrl;
-    @Value("${github.url.user}")
-    private String userUrl;
 
     public GithubAuthController(MemberService memberService) {
         this.memberService = memberService;
@@ -37,7 +32,7 @@ public class GithubAuthController {
 
     @GetMapping("/login")
     public void redirectToGithub(HttpServletResponse response) throws IOException {
-        String location = authorizeUrl + "?client_id=" + clientId + "&scope=repo,user";
+        String location = "https://github.com/login/oauth/authorize?client_id=" + clientId + "&scope=repo,user";
         response.sendRedirect(location);
     }
 
@@ -55,9 +50,10 @@ public class GithubAuthController {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", "application/json");
+        String url = "https://github.com/login/oauth/access_token";
         String body = String.format("client_id=%s&client_secret=%s&code=%s", clientId, clientSecret, code);
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<GithubTokenResponse> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, requestEntity, GithubTokenResponse.class);
+        ResponseEntity<GithubTokenResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, GithubTokenResponse.class);
         if (responseEntity.getBody() != null) {
             return responseEntity.getBody().getAccessToken();
         }
@@ -69,7 +65,7 @@ public class GithubAuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<GithubUserResponse> responseEntity = restTemplate.exchange(userUrl, HttpMethod.GET, requestEntity, GithubUserResponse.class);
+        ResponseEntity<GithubUserResponse> responseEntity = restTemplate.exchange("https://api.github.com/user", HttpMethod.GET, requestEntity, GithubUserResponse.class);
         if (responseEntity.getBody() != null) {
             return responseEntity.getBody().getLogin();
         }

@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 @Controller
@@ -25,12 +25,9 @@ public class NotionAuthController {
 
     @Value("${notion.client.id}")
     private String clientId;
+
     @Value("${notion.client.secret}")
     private String clientSecret;
-    @Value("${notion.url.authorize}")
-    private String authorizeUrl;
-    @Value("${notion.url.token}")
-    private String tokenUrl;
 
     private final String redirectUri = "http://localhost:8080/auth/notion/callback";
 
@@ -40,7 +37,7 @@ public class NotionAuthController {
 
     @GetMapping("/login")
     public void redirectToNotion(@RequestParam("user") String githubUsername, HttpServletResponse response) throws IOException {
-        String location = authorizeUrl + "?" +
+        String location = "https://api.notion.com/v1/oauth/authorize?" +
                 "client_id=" + clientId +
                 "&response_type=code" +
                 "&owner=user" +
@@ -67,7 +64,7 @@ public class NotionAuthController {
         headers.set("Authorization", authHeader);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, String> body = new HashMap<>();
+        Map<String, String> body = new java.util.HashMap<>();
         body.put("grant_type", "authorization_code");
         body.put("code", code);
         body.put("redirect_uri", redirectUri);
@@ -75,7 +72,7 @@ public class NotionAuthController {
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
         ResponseEntity<NotionTokenResponse> responseEntity = restTemplate.exchange(
-                tokenUrl,
+                "https://api.notion.com/v1/oauth/token",
                 HttpMethod.POST,
                 requestEntity,
                 NotionTokenResponse.class
