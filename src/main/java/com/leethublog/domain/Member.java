@@ -1,9 +1,13 @@
 package com.leethublog.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "members")
+@Getter
+@Setter
 public class Member {
 
     @Id
@@ -25,53 +29,53 @@ public class Member {
     @Column
     private String targetDbId;
 
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getGithubUsername() {
-        return githubUsername;
-    }
-
-    public void setGithubUsername(String githubUsername) {
-        this.githubUsername = githubUsername;
-    }
-
-    public String getEncryptedGithubToken() {
-        return encryptedGithubToken;
-    }
-
-    public void setEncryptedGithubToken(String encryptedGithubToken) {
-        this.encryptedGithubToken = encryptedGithubToken;
-    }
-
-    public String getEncryptedNotionToken() {
-        return encryptedNotionToken;
-    }
-
-    public void setEncryptedNotionToken(String encryptedNotionToken) {
-        this.encryptedNotionToken = encryptedNotionToken;
-    }
-
-    public String getTargetRepo() {
-        return targetRepo;
-    }
-
-    public void setTargetRepo(String targetRepo) {
-        this.targetRepo = targetRepo;
-    }
-
-    public String getTargetDbId() {
-        return targetDbId;
-    }
-
-    public void setTargetDbId(String targetDbId) {
-        this.targetDbId = targetDbId;
-    }
+//    // Getters and Setters
+//
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
+//
+//    public String getGithubUsername() {
+//        return githubUsername;
+//    }
+//
+//    public void setGithubUsername(String githubUsername) {
+//        this.githubUsername = githubUsername;
+//    }
+//
+//    public String getEncryptedGithubToken() {
+//        return encryptedGithubToken;
+//    }
+//
+//    public void setEncryptedGithubToken(String encryptedGithubToken) {
+//        this.encryptedGithubToken = encryptedGithubToken;
+//    }
+//
+//    public String getEncryptedNotionToken() {
+//        return encryptedNotionToken;
+//    }
+//
+//    public void setEncryptedNotionToken(String encryptedNotionToken) {
+//        this.encryptedNotionToken = encryptedNotionToken;
+//    }
+//
+//    public String getTargetRepo() {
+//        return targetRepo;
+//    }
+//
+//    public void setTargetRepo(String targetRepo) {
+//        this.targetRepo = targetRepo;
+//    }
+//
+//    public String getTargetDbId() {
+//        return targetDbId;
+//    }
+//
+//    public void setTargetDbId(String targetDbId) {
+//        this.targetDbId = targetDbId;
+//    }
 }

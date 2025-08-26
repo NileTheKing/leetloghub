@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@GetMapping("/api/github")
+//@GetMapping("/api/github")
 public class GithubAPIController {
 
     @GetMapping("/repo")

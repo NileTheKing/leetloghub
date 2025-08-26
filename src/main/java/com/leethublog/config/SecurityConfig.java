@@ -11,12 +11,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // 우선 CSRF 보호를 비활성화합니다.
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청에 대해 인증 없이 접근을 허용합니다.
+                        .requestMatchers("/", "/login.html", "/popup.html", "/popup.js", "/popup.css", "/images/**").permitAll() // 정적 리소스, 로그인, 팝업 페이지 허용
+                        .requestMatchers("/auth/github/login", "/login/oauth2/code/github").permitAll() // GitHub 로그인 과정 허용
+                        .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/auth-success.html", true) // 로그인 성공 시 리디렉션
+                        .failureUrl("/login-failure.html") // 로그인 실패 시 리디렉션
                 );
         return http.build();
     }

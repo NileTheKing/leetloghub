@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentication Success</title>
+</head>
+<body>
+    <p>Authentication successful. This window will close automatically.</p>
+    <script>
+        // ❗️여기에 chrome://extensions 에서 복사한 당신의 확장 프로그램 ID를 붙여넣으세요.
+        const extensionId = "oipnchpbocffnfemoobcogkeiolmbjon";
+
+        const params = new URLSearchParams(window.location.search);
+        const userData = {
+            isLoggedIn: true,
+            githubUsername: params.get('user')
+        };
+
+        chrome.runtime.sendMessage(extensionId, { type: 'AUTH_SUCCESS', data: userData }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError.message);
+                document.body.innerHTML = "Error: Could not connect to the extension. Make sure the extension ID is correct in auth-success.html.";
+            } else {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

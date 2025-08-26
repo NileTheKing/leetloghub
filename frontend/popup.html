@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetLog Hub</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Logged Out View -->
+        <div id="logged-out-view">
+            <h1>LeetLog Hub</h1>
+            <p>Connect your accounts to get started.</p>
+            <button id="login-button">Login with GitHub</button>
+        </div>
+
+        <!-- Logged In View (Initially Hidden) -->
+        <div id="logged-in-view" style="display: none;">
+            <h2 id="welcome-message">Welcome!</h2>
+            <p>Next, connect to Notion.</p>
+            <button id="connect-notion-button">Connect to Notion</button>
+            <hr>
+            <button id="logout-button">Logout</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

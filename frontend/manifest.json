@@ -1,0 +1,35 @@
+{
+    "manifest_version": 3,
+    "name": "LeetLog Hub",
+    "version": "0.1.0",
+    "description": "Automatically log your LeetCode solutions to GitHub and Notion.",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://localhost:8080/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/image.png",
+            "48": "images/image.png",
+            "128": "images/image.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "externally_connectable": {
+        "matches": [
+            "http://localhost:8080/*"
+        ]
+    },
+    "icons": {
+        "16": "images/image.png",
+        "48": "images/image.png",
+        "128": "images/image.png"
+    }
+}
