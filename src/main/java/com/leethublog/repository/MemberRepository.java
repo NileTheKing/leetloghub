@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByGithubUsername(String githubUsername);
+    Optional<Member> findByGithubId(Long githubId);
+    Optional<Member> findByGithubLogin(String githubLogin);
 }

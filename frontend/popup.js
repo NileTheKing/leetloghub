@@ -21,7 +21,7 @@ function updateUI(userData) {
 
 // Add click listener for the main login button
 loginButton.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:8080/auth/github/login' });
+    chrome.tabs.create({ url: 'http://localhost:8080/oauth2/authorization/github' });
 });
 
 // Add click listener for the Notion connect button

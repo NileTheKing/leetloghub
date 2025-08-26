@@ -2,36 +2,36 @@ package com.leethublog.service;
 
 import com.leethublog.domain.Member;
 import com.leethublog.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final EncryptionService encryptionService;
 
-    public MemberServiceImpl(MemberRepository memberRepository, EncryptionService encryptionService) {
-        this.memberRepository = memberRepository;
-        this.encryptionService = encryptionService;
-    }
-
     @Override
-    public Optional<Member> findByUsername(String username) {
-        return memberRepository.findByGithubUsername(username);
+    public Optional<Member> findByGithubLogin(String githubLogin) {
+        return memberRepository.findByGithubLogin(githubLogin);
     }
 
     @Transactional
-    public Member saveGithubAuth(String githubUsername, String accessToken) {
-        Optional<Member> existingMember = memberRepository.findByGithubUsername(githubUsername);
+    @Override
+    public Member saveGithubAuth(Long githubId, String githubLogin, String accessToken) {
+        // Find member by the immutable githubId
+        Optional<Member> existingMember = memberRepository.findByGithubId(githubId);
 
         Member member = existingMember.orElseGet(Member::new);
-        if (member.getGithubUsername() == null) {
-            member.setGithubUsername(githubUsername);
-        }
-        
+
+        // Set or update member details
+        member.setGithubId(githubId);
+        member.setGithubLogin(githubLogin); // Update login name in case it has changed
+
         String encryptedToken = encryptionService.encrypt(accessToken);
         member.setEncryptedGithubToken(encryptedToken);
 
@@ -39,11 +39,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Transactional
-    public Member saveNotionAuth(String githubUsername, String accessToken) {
-        Member member = memberRepository.findByGithubUsername(githubUsername)
+    @Override
+    public Member saveNotionAuth(Long githubId, String accessToken) {
+        // Find user by their immutable GitHub ID
+        Member member = memberRepository.findByGithubId(githubId)
                 .orElseThrow(() -> new IllegalStateException(
-                        "Cannot save Notion token without an existing GitHub authentication."));
-        
+                        "Cannot save Notion token for a user not registered with GitHub. GitHub ID: " + githubId));
+
         String encryptedToken = encryptionService.encrypt(accessToken);
         member.setEncryptedNotionToken(encryptedToken);
 
