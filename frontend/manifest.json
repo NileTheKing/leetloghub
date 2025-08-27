@@ -3,10 +3,11 @@
     "name": "LeetLog Hub",
     "version": "0.1.0",
     "description": "Automatically log your LeetCode solutions to GitHub and Notion.",
-    "permissions": [
+        "permissions": [
         "storage",
         "activeTab",
-        "scripting"
+        "scripting",
+        "tabs"
     ],
     "host_permissions": [
         "http://localhost:8080/*"

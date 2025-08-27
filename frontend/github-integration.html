@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LeetLogHub Setup</title>
+    <link rel="stylesheet" href="github-integration.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LeetLogHub Setup</h1>
+            <p id="welcome-message">Welcome! Let's get you set up.</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2><span class="step-number">1</span> Connect GitHub Repository</h2>
+                <p class="description">Select or create a repository to automatically save your LeetCode solutions.</p>
+                
+                <div id="repo-loading">
+                    <div class="spinner"></div>
+                    <p>Loading your repositories...</p>
+                </div>
+
+                <div id="repo-selection" class="hidden">
+                    <label for="repo-list">Select an existing repository:</label>
+                    <select id="repo-list"></select>
+                    <button id="connect-repo-button" class="button-primary">Connect Repo</button>
+                    
+                    <div class="divider">OR</div>
+
+                    <label for="new-repo-name">Create a new public repository:</label>
+                    <div class="new-repo-controls">
+                        <input type="text" id="new-repo-name" placeholder="my-leetcode-solutions" />
+                        <button id="create-repo-button" class="button-secondary">Create & Connect</button>
+                    </div>
+                </div>
+                
+                <div id="repo-connected" class="hidden success-message">
+                    <p>✅ Connected to GitHub repository: <strong id="connected-repo-name"></strong></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="step-number">2</span> Connect Notion Workspace</h2>
+                <p class="description">Connect your Notion account to manage your study plans and track progress.</p>
+                
+                <div id="notion-disconnected">
+                    <button id="connect-notion-button" class="button-primary">Connect to Notion</button>
+                </div>
+                
+                <div id="notion-connected" class="hidden">
+                    <p>✅ Connected to Notion workspace: <strong id="notion-workspace-name"></strong></p>
+                    <hr>
+                    <div id="notion-page-selection">
+                        <label for="page-list">Select a parent page for your LeetLogHub Database:</label>
+                        <div id="page-loading">Loading pages...</div>
+                        <div id="page-selection-controls" class="hidden">
+                            <select id="page-list"></select>
+                            <button id="create-db-button" class="button-primary">Create Database Here</button>
+                        </div>
+                    </div>
+                    <div id="notion-db-created" class="hidden success-message">
+                        <p>✅ All set! Your Notion database is ready.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="github-integration.js"></script>
+</body>
+</html>

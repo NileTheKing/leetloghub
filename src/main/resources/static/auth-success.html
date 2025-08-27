@@ -11,15 +11,17 @@
         const extensionId = "oipnchpbocffnfemoobcogkeiolmbjon";
 
         const params = new URLSearchParams(window.location.search);
-        const userData = {
-            isLoggedIn: true,
-            githubUsername: params.get('user')
-        };
+        const data = {};
+        for (const [key, value] of params.entries()) {
+            data[key] = value;
+        }
 
-        chrome.runtime.sendMessage(extensionId, { type: 'AUTH_SUCCESS', data: userData }, (response) => {
+        const messageType = params.get('provider') === 'notion' ? 'NOTION_AUTH_SUCCESS' : 'GITHUB_AUTH_SUCCESS';
+
+        chrome.runtime.sendMessage(extensionId, { type: messageType, data: data }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error(chrome.runtime.lastError.message);
-                document.body.innerHTML = "Error: Could not connect to the extension. Make sure the extension ID is correct in auth-success.html.";
+                document.body.innerHTML = 'error';
             } else {
                 window.close();
             }

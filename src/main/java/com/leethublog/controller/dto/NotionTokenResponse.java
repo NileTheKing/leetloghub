@@ -22,6 +22,8 @@ public class NotionTokenResponse {
     private String workspaceId;
     @JsonProperty("workspace_name")//A human-readable name that can be used to display this authorization in the UI.
     private String workspaceName;
+    @JsonProperty("duplicated_template_id")
+    private String duplicatedTemplateId; // When a user duplicates a template, this is the ID of the duplicated page.
 
 
 
