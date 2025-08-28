@@ -60,7 +60,8 @@ public class NotionAuthController {
         // Just save the access token, DB selection will happen in the frontend
         memberService.saveNotionAuth(
                 githubId,
-                notionTokenResponse.getAccessToken()
+                notionTokenResponse.getAccessToken(),
+                notionTokenResponse.getRefreshToken()
         );
 
         log.info("Successfully linked Notion account for user with GitHub ID: {}", githubId);

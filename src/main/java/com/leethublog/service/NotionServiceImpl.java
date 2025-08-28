@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -68,6 +69,7 @@ public class NotionServiceImpl implements NotionService {
         Map<String, Object> additionalParams = tokenResponse.getAdditionalParameters();
         NotionTokenResponse notionTokenResponse = new NotionTokenResponse();
         notionTokenResponse.setAccessToken(tokenResponse.getAccessToken().getTokenValue());
+        notionTokenResponse.setRefreshToken(Objects.requireNonNull(tokenResponse.getRefreshToken()).getTokenValue());
         notionTokenResponse.setWorkspaceName((String) additionalParams.get("workspace_name"));
         notionTokenResponse.setWorkspaceId((String) additionalParams.get("workspace_id"));
         notionTokenResponse.setBotId((String) additionalParams.get("bot_id"));

@@ -26,6 +26,9 @@ public class Member {
     @Column(length = 1024)
     private String encryptedNotionToken;
 
+    @Column(length = 1024)
+    private String encryptedNotionRefreshToken;
+
 
     @Column
     private String targetRepo;

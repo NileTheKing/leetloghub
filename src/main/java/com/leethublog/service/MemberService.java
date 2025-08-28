@@ -9,5 +9,5 @@ public interface MemberService {
 
     Member saveGithubAuth(Long githubId, String githubLogin, String accessToken);
 
-    Member saveNotionAuth(Long githubId, String accessToken);
+    Member saveNotionAuth(Long githubId, String accessToken, String refreshToken);
 }
