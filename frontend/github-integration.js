@@ -74,22 +74,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Data Fetching ---
     function fetchRepositories() {
-        // MOCK IMPLEMENTATION
         repoLoading.classList.remove('hidden');
         repoSelection.classList.add('hidden');
-        setTimeout(() => {
-            repoLoading.classList.add('hidden');
-            repoSelection.classList.remove('hidden');
-            // Mock data, replace with actual API call
-            const mockRepos = [{ name: 'leetcode-solutions' }, { name: 'my-leet-log' }];
-            repoList.innerHTML = '';
-            mockRepos.forEach(repo => {
-                const option = document.createElement('option');
-                option.value = repo.name;
-                option.textContent = repo.name;
-                repoList.appendChild(option);
+
+        fetch('http://localhost:8080/api/github/repos')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(repos => {
+                repoList.innerHTML = ''; // Clear existing options
+                repos.forEach(repo => {
+                    const option = document.createElement('option');
+                    // Use the unique fullName as the value
+                    option.value = repo.fullName;
+                    // Display the simple name in the list
+                    option.textContent = repo.name;
+                    repoList.appendChild(option);
+                });
+                repoLoading.classList.add('hidden');
+                repoSelection.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error fetching GitHub repositories:', error);
+                repoLoading.textContent = 'Error loading repositories. Please ensure the backend is running and you are logged in.';
             });
-        }, 1000);
     }
 
     function fetchNotionPages() {
