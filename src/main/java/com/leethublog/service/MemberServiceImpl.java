@@ -15,11 +15,6 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final EncryptionService encryptionService;
 
-    @Override
-    public Optional<Member> findByGithubLogin(String githubLogin) {
-        return memberRepository.findByGithubLogin(githubLogin);
-    }
-
     @Transactional
     @Override
     public Member saveGithubAuth(Long githubId, String githubLogin, String accessToken) {
@@ -40,16 +35,20 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public Member saveNotionAuth(Long githubId, String accessToken, String refreshToken) {
+    public Member saveNotionAuth(Long githubId, String accessToken, String refreshToken, String databaseId) {
         // Find user by their immutable GitHub ID
         Member member = memberRepository.findByGithubId(githubId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Cannot save Notion token for a user not registered with GitHub. GitHub ID: " + githubId));
 
         String encryptedAccessToken = encryptionService.encrypt(accessToken);
-        String encryptedRefreshToken = encryptionService.encrypt(refreshToken);
         member.setEncryptedNotionToken(encryptedAccessToken);
-        member.setEncryptedNotionRefreshToken(encryptedRefreshToken);
+        member.setTargetDbId(databaseId); // Save the Notion Database ID
+
+        if (refreshToken != null) {
+            String encryptedRefreshToken = encryptionService.encrypt(refreshToken);
+            member.setEncryptedNotionRefreshToken(encryptedRefreshToken);
+        }
 
         return memberRepository.save(member);
     }

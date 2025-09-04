@@ -53,18 +53,24 @@ public class NotionAuthController {
         NotionTokenResponse notionTokenResponse = notionService.requestAccessToken(code);
 
         if (notionTokenResponse == null) {
-            log.error("Failed to retrieve Notion token for user {}", githubId);
-            return "redirect:/login-failure.html?error=notion_token_error";
+            log.error("Failed to retrieve Notion token  for user {}.", githubId);
+            return "redirect:/login-failure.html?error=notion_template_error";
+        }
+        if (notionTokenResponse.getDuplicatedTemplateId() == null) {
+            log.error("Failed to retrieve No duplicated_template_id for user {}.", githubId);
+            return "redirect:/login-failure.html?error=notion_template_error";
         }
 
-        // Just save the access token, DB selection will happen in the frontend
+
+        // Save all relevant tokens and the new database ID
         memberService.saveNotionAuth(
                 githubId,
                 notionTokenResponse.getAccessToken(),
-                notionTokenResponse.getRefreshToken()
+                notionTokenResponse.getRefreshToken(),
+                notionTokenResponse.getDuplicatedTemplateId()
         );
 
-        log.info("Successfully linked Notion account for user with GitHub ID: {}", githubId);
+        log.info("Successfully linked Notion account and saved database ID for user with GitHub ID: {}", githubId);
 
         String redirectUrl = UriComponentsBuilder.fromPath("/auth-success.html")
                 .queryParam("provider", "notion")

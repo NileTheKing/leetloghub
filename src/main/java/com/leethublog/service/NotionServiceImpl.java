@@ -1,7 +1,10 @@
 package com.leethublog.service;
 
+import com.leethublog.controller.dto.CreateDbRequestDto;
 import com.leethublog.controller.dto.NotionPageDto;
 import com.leethublog.controller.dto.NotionTokenResponse;
+import com.leethublog.domain.Member;
+import com.leethublog.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,8 +18,9 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExch
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Collections;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,12 +31,9 @@ import java.util.Objects;
 public class NotionServiceImpl implements NotionService {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
-
-    @Override
-    public void createPageInDatabase(String token, String databaseId, String title) {
-        // This part is not in the scope of the current task.
-        log.info("Creating Notion page with title: {}", title);
-    }
+    private final MemberRepository memberRepository;
+    private final EncryptionService encryptionService;
+    //private final WebClient webClient;
 
     @Override
     public NotionTokenResponse requestAccessToken(String code) {
@@ -69,36 +70,36 @@ public class NotionServiceImpl implements NotionService {
         Map<String, Object> additionalParams = tokenResponse.getAdditionalParameters();
         NotionTokenResponse notionTokenResponse = new NotionTokenResponse();
         notionTokenResponse.setAccessToken(tokenResponse.getAccessToken().getTokenValue());
-        notionTokenResponse.setRefreshToken(Objects.requireNonNull(tokenResponse.getRefreshToken()).getTokenValue());
+        if (tokenResponse.getRefreshToken() != null) {
+            notionTokenResponse.setRefreshToken(tokenResponse.getRefreshToken().getTokenValue());
+        }
         notionTokenResponse.setWorkspaceName((String) additionalParams.get("workspace_name"));
         notionTokenResponse.setWorkspaceId((String) additionalParams.get("workspace_id"));
         notionTokenResponse.setBotId((String) additionalParams.get("bot_id"));
+        notionTokenResponse.setDuplicatedTemplateId((String) additionalParams.get("duplicated_template_id"));
 
         return notionTokenResponse;
     }
 
     @Override
-    public List<NotionPageDto> getAvailablePages(Authentication authentication) {
-        // TODO: Implement this method. It should:
-        // 1. Get the Member entity based on the Authentication principal.
-        // 2. Decrypt the Notion access token.
-        // 3. Use the token to call Notion's /v1/search endpoint to find pages shared with the integration.
-        // 4. Map the results to a List<NotionPageDto> and return it.
-        log.warn("getAvailablePages is not implemented. Returning mock data.");
-        NotionPageDto page1 = new NotionPageDto();
-        page1.setId("mock-page-id-1");
-        page1.setTitle("My Private Journal 📓");
-        return Collections.singletonList(page1);
+    public void submitProblemsToNotion(String githubLogin, Iterable<NotionPageDto> notionPageDtoList) {
+
     }
 
     @Override
-    public void createDatabase(String pageId, Authentication authentication) {
-        // TODO: Implement this method. It should:
-        // 1. Get the Member entity based on the Authentication principal.
-        // 2. Decrypt the Notion access token.
-        // 3. Use the token to call Notion's /v1/databases endpoint to create a new database with the given pageId as the parent.
-        // 4. Save the new database ID to the Member entity.
-        log.warn("createDatabase is not implemented. Mocking action.");
+    public List<NotionPageDto> getAvailablePages(Authentication authentication) {
+        return List.of();
+    }
+
+    @Override
+    public CreateDbRequestDto createDatabase(String pageId, Authentication authentication) {
+        String userGithubId = authentication.getName();
+        Member member = memberRepository.findByGithubId(Long.parseLong(userGithubId))
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userGithubId));
+        String decryptedNotionAccessToken = encryptionService.decrypt(Objects.requireNonNull(member.getEncryptedNotionToken()));
+
+
+
     }
 }
 
