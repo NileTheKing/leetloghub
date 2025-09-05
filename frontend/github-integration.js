@@ -153,27 +153,58 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please select a page first.');
             return;
         }
-        // This would be a fetch call to your backend: POST /api/notion/database
-        fetch('http://localhost:8080/api/notion/database', {
+
+        // Corrected fetch call
+        fetch('http://localhost:8080/api/notion/databases', { // Use plural 'databases'
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pageId: selectedPageId })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.databaseId) {
-                // Save final state
-                chrome.storage.local.set({ dbCreated: true });
-                handleNotionDbCreated(JSON.parse(localStorage.getItem('connectedNotion'))); // a bit of a hack to get workspace name
+        .then(response => {
+            if (!response.ok) {
+                // Try to get error details from backend, but don't assume it's JSON
+                return response.text().then(text => { 
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                });
             }
+            // If response is OK (200), we don't need to parse a body.
+            return; 
         })
-        .catch(error => console.error('Error creating database:', error));
+        .then(() => {
+            // Success case
+            chrome.storage.local.set({ dbCreated: true });
+            // The storage.onChanged listener will automatically handle the UI update.
+        })
+        .catch(error => {
+            console.error('Error creating database:', error);
+            alert('Failed to create database. Check the console for details.');
+        });
     });
 
-    // --- Message Listener from Background Script ---
+    // --- Message Listener from Background Script (Less reliable) ---
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.type === 'NOTION_CONNECTION_SUCCESS') {
+            console.log('Received message to update Notion UI.');
             handleNotionConnected(message.data);
+        }
+    });
+
+    // --- Storage Change Listener (More reliable) ---
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace === 'local' && changes.connectedNotion) {
+            console.log('Detected a change in connectedNotion storage. Updating UI.');
+            const notionData = changes.connectedNotion.newValue;
+            if (notionData && notionData.status === 'success') {
+                handleNotionConnected(notionData);
+            }
+        }
+        if (namespace === 'local' && changes.dbCreated) {
+            console.log('Detected a change in dbCreated storage. Updating UI.');
+            if (changes.dbCreated.newValue === true) {
+                chrome.storage.local.get('connectedNotion', (result) => {
+                    handleNotionDbCreated(result.connectedNotion);
+                });
+            }
         }
     });
 });

@@ -23,9 +23,13 @@ public class NotionAPIController {
 
     private final NotionService notionService;
 
+    @GetMapping("/pages")
+    public ResponseEntity<List<NotionPageDto>> getAvailablePages(Authentication authentication) {
+        return ResponseEntity.ok(notionService.getAvailablePages(authentication));
+    }
+
     @PostMapping("/databases")
-    public ResponseEntity<CreateDbRequestDto> createNotionDatabase(@RequestBody CreateDbRequestDto createDbRequestDto, Authentication authentication) {
-        String githubLogin = authentication.getName();
+    public ResponseEntity<Void> createNotionDatabase(@RequestBody CreateDbRequestDto createDbRequestDto, Authentication authentication) {
         notionService.createDatabase(createDbRequestDto.getPageId(), authentication);
         return ResponseEntity.ok().build();
     }

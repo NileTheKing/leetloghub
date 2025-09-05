@@ -25,19 +25,14 @@ public class NotionAuthController {
     private final NotionService notionService;
     private final MemberService memberService;
 
-    // Starts the Notion account linking process
     @GetMapping("/login")
     public void connectToNotion(Authentication authentication, HttpSession session, HttpServletResponse response) throws IOException {
         String githubId = authentication.getName();
         log.info("Starting Notion connection for user with GitHub ID: {}", githubId);
-
         session.setAttribute("githubIdToLink", githubId);
-
-        // Redirect to the standard Spring Security endpoint to initiate the Notion OAuth2 flow
         response.sendRedirect("/oauth2/authorization/notion");
     }
 
-    // This is the callback endpoint that Notion redirects to.
     @GetMapping("/callback")
     public String handleNotionCallback(@RequestParam("code") String code, HttpSession session) {
         String githubIdStr = (String) session.getAttribute("githubIdToLink");
@@ -53,24 +48,13 @@ public class NotionAuthController {
         NotionTokenResponse notionTokenResponse = notionService.requestAccessToken(code);
 
         if (notionTokenResponse == null) {
-            log.error("Failed to retrieve Notion token  for user {}.", githubId);
-            return "redirect:/login-failure.html?error=notion_template_error";
-        }
-        if (notionTokenResponse.getDuplicatedTemplateId() == null) {
-            log.error("Failed to retrieve No duplicated_template_id for user {}.", githubId);
-            return "redirect:/login-failure.html?error=notion_template_error";
+            log.error("Failed to retrieve Notion token for user {}", githubId);
+            return "redirect:/login-failure.html?error=notion_token_error";
         }
 
+        memberService.saveNotionAuth(githubId, notionTokenResponse.getAccessToken(), notionTokenResponse.getRefreshToken());
 
-        // Save all relevant tokens and the new database ID
-        memberService.saveNotionAuth(
-                githubId,
-                notionTokenResponse.getAccessToken(),
-                notionTokenResponse.getRefreshToken(),
-                notionTokenResponse.getDuplicatedTemplateId()
-        );
-
-        log.info("Successfully linked Notion account and saved database ID for user with GitHub ID: {}", githubId);
+        log.info("Successfully linked Notion account for user with GitHub ID: {}", githubId);
 
         String redirectUrl = UriComponentsBuilder.fromPath("/auth-success.html")
                 .queryParam("provider", "notion")
