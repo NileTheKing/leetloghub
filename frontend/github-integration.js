@@ -76,8 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function fetchRepositories() {
         repoLoading.classList.remove('hidden');
         repoSelection.classList.add('hidden');
+        connectRepoButton.disabled = true;
 
-        fetch('http://localhost:8080/api/github/repos')
+        fetch('http://localhost:8080/api/config/github/repos')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -86,16 +87,22 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(repos => {
                 repoList.innerHTML = ''; // Clear existing options
+                if (!repos || repos.length === 0) {
+                    repoLoading.classList.remove('hidden');
+                    repoLoading.textContent = 'No repositories with push access found.';
+                    return; // Keep button disabled
+                }
+
                 repos.forEach(repo => {
                     const option = document.createElement('option');
-                    // Use the unique fullName as the value
-                    option.value = repo.fullName;
-                    // Display the simple name in the list
-                    option.textContent = repo.name;
+                    option.value = repo.full_name;
+                    option.textContent = `${repo.name} ${repo.private ? '🔒' : ''}`;
                     repoList.appendChild(option);
                 });
+
                 repoLoading.classList.add('hidden');
                 repoSelection.classList.remove('hidden');
+                connectRepoButton.disabled = false; // Re-enable button after loading
             })
             .catch(error => {
                 console.error('Error fetching GitHub repositories:', error);
@@ -106,8 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function fetchNotionPages() {
         pageLoading.classList.remove('hidden');
         pageSelectionControls.classList.add('hidden');
-        // This would be a fetch call to your backend: GET /api/notion/pages
-        fetch('http://localhost:8080/api/notion/pages')
+        fetch('http://localhost:8080/api/config/notion/pages')
             .then(response => response.json())
             .then(pages => {
                 pageList.innerHTML = '';
@@ -128,16 +134,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
     connectRepoButton.addEventListener('click', () => {
-        const selectedRepo = repoList.value;
-        if (selectedRepo) {
-            chrome.storage.local.set({ connectedRepo: selectedRepo }, () => showConnectedRepo(selectedRepo));
+        const repoDropdown = document.getElementById('repo-list');
+        const selectedRepoFullName = repoDropdown.value;
+
+        if (selectedRepoFullName && selectedRepoFullName !== 'undefined' && selectedRepoFullName !== '') {
+            fetch('http://localhost:8080/api/config/github/target-repository', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ repoFullName: selectedRepoFullName })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                chrome.storage.local.set({ connectedRepo: selectedRepoFullName }, () => {
+                    showConnectedRepo(selectedRepoFullName);
+                });
+            })
+            .catch(error => {
+                console.error('Error linking repository:', error);
+                alert('Failed to link repository. Check console for details.');
+            });
+        } else {
+            alert("Please select a valid repository from the list.");
         }
     });
 
     createRepoButton.addEventListener('click', () => {
         const newRepoName = newRepoNameInput.value.trim();
         if (newRepoName) {
-            chrome.storage.local.set({ connectedRepo: newRepoName }, () => showConnectedRepo(newRepoName));
+            fetch('http://localhost:8080/api/config/github/repos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newRepoName, isPrivate: false })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(newRepo => {
+                chrome.storage.local.set({ connectedRepo: newRepo.full_name }, () => {
+                    showConnectedRepo(newRepo.full_name);
+                });
+            })
+            .catch(error => {
+                console.error('Error creating repository:', error);
+                alert('Failed to create repository. Check console for details.');
+            });
+
         } else {
             alert('Please enter a name for the new repository.');
         }
@@ -154,26 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Corrected fetch call
-        fetch('http://localhost:8080/api/notion/databases', { // Use plural 'databases'
+        fetch('http://localhost:8080/api/config/notion/databases', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pageId: selectedPageId })
         })
         .then(response => {
             if (!response.ok) {
-                // Try to get error details from backend, but don't assume it's JSON
                 return response.text().then(text => { 
                     throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
                 });
             }
-            // If response is OK (200), we don't need to parse a body.
             return; 
         })
         .then(() => {
-            // Success case
             chrome.storage.local.set({ dbCreated: true });
-            // The storage.onChanged listener will automatically handle the UI update.
         })
         .catch(error => {
             console.error('Error creating database:', error);
@@ -181,25 +222,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Message Listener from Background Script (Less reliable) ---
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.type === 'NOTION_CONNECTION_SUCCESS') {
-            console.log('Received message to update Notion UI.');
-            handleNotionConnected(message.data);
-        }
-    });
-
     // --- Storage Change Listener (More reliable) ---
     chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'local' && changes.connectedNotion) {
-            console.log('Detected a change in connectedNotion storage. Updating UI.');
             const notionData = changes.connectedNotion.newValue;
             if (notionData && notionData.status === 'success') {
                 handleNotionConnected(notionData);
             }
         }
         if (namespace === 'local' && changes.dbCreated) {
-            console.log('Detected a change in dbCreated storage. Updating UI.');
             if (changes.dbCreated.newValue === true) {
                 chrome.storage.local.get('connectedNotion', (result) => {
                     handleNotionDbCreated(result.connectedNotion);
