@@ -17,21 +17,27 @@ public class SolveLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime solvedAt;
+    @Column(nullable = false)
+    private String problemTitle;
+
+    @Column(nullable = false)
+    private String problemUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Difficulty problemDifficulty;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SolveStatus solveStatus;
 
     @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String code;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Difficulty perceivedDifficulty;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "problem_id", nullable = false)
-    private Problem problem;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime solvedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

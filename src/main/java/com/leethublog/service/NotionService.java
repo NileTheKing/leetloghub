@@ -1,7 +1,9 @@
 package com.leethublog.service;
 
 import com.leethublog.controller.dto.NotionPageDto;
+import com.leethublog.controller.dto.NotionSyncDto;
 import com.leethublog.controller.dto.NotionTokenResponse;
+import com.leethublog.domain.Member;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
@@ -14,6 +16,6 @@ public interface NotionService {
 
     void createDatabase(String pageId, Authentication authentication);
 
-    void submitProblemsToNotion(String githubLogin, Iterable<NotionPageDto> notionPageDtoList);
+    void syncSolveToNotion(Member member, NotionSyncDto syncData);
 
 }

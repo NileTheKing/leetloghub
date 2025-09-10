@@ -1,5 +1,9 @@
-//package com.leethublog.service;
-//
-//public interface SolveService {
-//    void logSolution(String username, String problemTitle, String code, String directoryPath);
-//}
+package com.leethublog.service;
+
+import com.leethublog.controller.dto.SolveRequestDto;
+import org.springframework.security.core.Authentication;
+
+public interface SolveService {
+    void processNewSolve(Authentication authentication, SolveRequestDto solveRequest);
+
+}

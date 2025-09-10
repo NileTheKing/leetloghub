@@ -1,41 +1,21 @@
 package com.leethublog.controller.dto;
 
+import com.leethublog.domain.Difficulty;
+import com.leethublog.domain.SolveStatus;
+import lombok.Data;
+
+@Data
 public class SolveRequestDto {
-    private String username;
+    // Problem Info
     private String problemTitle;
+    private String problemUrl;
+    private Difficulty problemDifficulty;
+    private SolveStatus solveStatus; // Changed from perceivedDifficulty
     private String code;
-    private String directoryPath;
 
-    // Getters and Setters
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getProblemTitle() {
-        return problemTitle;
-    }
-
-    public void setProblemTitle(String problemTitle) {
-        this.problemTitle = problemTitle;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getDirectoryPath() {
-        return directoryPath;
-    }
-
-    public void setDirectoryPath(String directoryPath) {
-        this.directoryPath = directoryPath;
-    }
+    // Performance Metrics
+    private Double runtimePercentile;
+    private Integer runtimeMs;
+    private Double memoryPercentile;
+    private Double memoryMb;
 }
