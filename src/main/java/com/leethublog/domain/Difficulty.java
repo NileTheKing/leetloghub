@@ -1,5 +1,5 @@
 package com.leethublog.domain;
 
 public enum Difficulty {
-    EASY, MEDIUM, HARD
+    EASY, MEDIUM, HARD, UNKNOWN
 }

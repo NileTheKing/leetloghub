@@ -10,7 +10,30 @@
         "tabs"
     ],
     "host_permissions": [
-        "http://localhost:8080/*"
+        "http://localhost:8080/*",
+        "https://leetcode.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://leetcode.com/problems/*"
+            ],
+            "js": [
+                "interceptor.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN"
+        },
+        {
+            "matches": [
+                "https://leetcode.com/problems/*"
+            ],
+            "js": [
+                "bridge.js"
+            ],
+            "run_at": "document_idle",
+            "world": "ISOLATED"
+        }
     ],
     "action": {
         "default_popup": "popup.html",

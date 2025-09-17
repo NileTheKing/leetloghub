@@ -19,21 +19,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // Let the default service load the user details from GitHub
         OAuth2User oauth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oauth2User.getAttributes();
 
-        // Extract the immutable githubId and the changeable login name
-        String githubIdStr = oauth2User.getName();
-        Long githubId = Long.parseLong(githubIdStr);
+        Long githubId = Long.parseLong(oauth2User.getName());
         String githubLogin = (String) attributes.get("login");
-
-        // Extract the access token
         String accessToken = userRequest.getAccessToken().getTokenValue();
+
+        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        log.info("Raw GitHub Access Token for testing: {}", accessToken);
+        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         log.info("User loaded via OAuth2. GitHub ID: {}, Login: {}. Saving auth info.", githubId, githubLogin);
 
-        // Save the authentication info to our database
         memberService.saveGithubAuth(githubId, githubLogin, accessToken);
 
         return oauth2User;

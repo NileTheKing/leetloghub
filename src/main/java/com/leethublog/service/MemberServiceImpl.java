@@ -3,6 +3,7 @@ package com.leethublog.service;
 import com.leethublog.domain.Member;
 import com.leethublog.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +19,10 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public Member saveGithubAuth(Long githubId, String githubLogin, String accessToken) {
-        // Find member by the immutable githubId
-        Optional<Member> existingMember = memberRepository.findByGithubId(githubId);
-
-        Member member = existingMember.orElseGet(Member::new);
-
-        // Set or update member details
+        Member member = memberRepository.findByGithubId(githubId).orElseGet(Member::new);
         member.setGithubId(githubId);
-        member.setGithubLogin(githubLogin); // Update login name in case it has changed
-
-        String encryptedToken = encryptionService.encrypt(accessToken);
-        member.setEncryptedGithubToken(encryptedToken);
-
+        member.setGithubLogin(githubLogin);
+        member.setEncryptedGithubToken(encryptionService.encrypt(accessToken));
         return memberRepository.save(member);
     }
 

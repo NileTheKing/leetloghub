@@ -8,6 +8,7 @@ import com.leethublog.controller.dto.SelectRepoRequestDto;
 import com.leethublog.service.GithubService;
 import com.leethublog.service.NotionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/config") // New base path for all configuration APIs
 @RequiredArgsConstructor
+@Slf4j
 public class ConfigurationController {
 
     private final GithubService githubService;
@@ -27,6 +29,7 @@ public class ConfigurationController {
 
     @GetMapping("/github/repos")
     public ResponseEntity<List<GithubRepoDto>> getGithubRepos(Authentication authentication) {
+        log.info("Fetching GitHub repositories for user: {}", authentication.getName());
         return ResponseEntity.ok(githubService.getUserRepos(authentication));
     }
 

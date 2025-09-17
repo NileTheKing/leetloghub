@@ -25,6 +25,7 @@ public class SolveServiceImpl implements SolveService {
     private final SolveLogRepository solveLogRepository;
     private final ProblemStatusRepository problemStatusRepository;
     private final NotionService notionService;
+    private final GithubService githubService; // Add GithubService dependency
 
     @Override
     @Transactional
@@ -57,6 +58,9 @@ public class SolveServiceImpl implements SolveService {
 
         // 8. Sync to Notion
         notionService.syncSolveToNotion(member, syncDto);
+
+        // 9. Upload solution files to GitHub
+        githubService.uploadSolutionFiles(authentication, solveRequest);
     }
 
     private SolveLog saveNewSolveLog(Member member, SolveRequestDto solveRequest) {

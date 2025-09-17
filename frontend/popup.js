@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Main UI Update Function ---
     function updatePopupUI() {
         chrome.storage.local.get(['user', 'connectedNotion'], (result) => {
+            console.log('[DEBUG] Popup UI update check:', result); // Log the entire result from storage
             if (result.user && result.user.isLoggedIn) {
                 // --- User is logged in, show dashboard ---
                 loggedOutView.style.display = 'none';
@@ -60,7 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     connectNotionButton.addEventListener('click', () => {
-        chrome.tabs.create({ url: 'http://localhost:8080/auth/notion/login' });
+        chrome.storage.local.get(['authToken'], (result) => {
+            if (result.authToken) {
+                const url = `http://localhost:8080/auth/notion/login?token=${result.authToken}`;
+                chrome.tabs.create({ url });
+            } else {
+                alert('Authentication token not found. Please log in again.');
+            }
+        });
     });
 
     settingsLink.addEventListener('click', (e) => {

@@ -1,6 +1,7 @@
 package com.leethublog.service;
 
 import com.leethublog.domain.Member;
+import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
 
