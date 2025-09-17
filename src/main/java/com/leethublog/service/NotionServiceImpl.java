@@ -14,9 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
@@ -27,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -45,15 +41,13 @@ public class NotionServiceImpl implements NotionService {
 
     @PostConstruct
     public void init() {
-        this.webClient = webClientBuilder
-                .baseUrl("https://api.notion.com")
-                .defaultHeader("Notion-Version", "2022-06-28")
-                .build();
+        this.webClient = webClientBuilder.build();
     }
 
     @Override
     public NotionTokenResponse requestAccessToken(String code) {
-        OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+        RestClientAuthorizationCodeTokenResponseClient tokenResponseClient = new RestClientAuthorizationCodeTokenResponseClient();
+
         ClientRegistration notionRegistration = this.clientRegistrationRepository.findByRegistrationId("notion");
         OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                 .clientId(notionRegistration.getClientId())
@@ -62,10 +56,14 @@ public class NotionServiceImpl implements NotionService {
                 .scopes(notionRegistration.getScopes())
                 .state("state-dummy")
                 .build();
+
         OAuth2AuthorizationResponse authorizationResponse = OAuth2AuthorizationResponse.success(code)
                 .redirectUri(notionRegistration.getRedirectUri())
+                .state("state-dummy")
                 .build();
+
         OAuth2AuthorizationCodeGrantRequest grantRequest = new OAuth2AuthorizationCodeGrantRequest(notionRegistration, new OAuth2AuthorizationExchange(authorizationRequest, authorizationResponse));
+
         OAuth2AccessTokenResponse tokenResponse = tokenResponseClient.getTokenResponse(grantRequest);
 
         if (tokenResponse == null) {
@@ -91,8 +89,9 @@ public class NotionServiceImpl implements NotionService {
 
         try {
             JsonNode response = webClient.post()
-                    .uri("/v1/search")
+                    .uri("https://api.notion.com/v1/search")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .header("Notion-Version", "2022-06-28")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
@@ -124,8 +123,9 @@ public class NotionServiceImpl implements NotionService {
 
         try {
             JsonNode response = webClient.post()
-                    .uri("/v1/databases")
+                    .uri("https://api.notion.com/v1/databases")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .header("Notion-Version", "2022-06-28")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
@@ -175,8 +175,9 @@ public class NotionServiceImpl implements NotionService {
         String queryBody = String.format("{ \"filter\": { \"property\": \"ProblemTitle\", \"title\": { \"equals\": \"%s\" } } }", problemTitle);
 
         JsonNode response = webClient.post()
-                .uri("/v1/databases/" + databaseId + "/query")
+                .uri("https://api.notion.com/v1/databases/" + databaseId + "/query")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("Notion-Version", "2022-06-28")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(queryBody)
                 .retrieve()
@@ -194,8 +195,9 @@ public class NotionServiceImpl implements NotionService {
         Map<String, Object> requestBody = Map.of("properties", properties);
 
         webClient.patch()
-                .uri("/v1/pages/" + pageId)
+                .uri("https://api.notion.com/v1/pages/" + pageId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("Notion-Version", "2022-06-28")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
@@ -212,8 +214,9 @@ public class NotionServiceImpl implements NotionService {
         );
 
         webClient.post()
-                .uri("/v1/pages")
+                .uri("https://api.notion.com/v1/pages")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header("Notion-Version", "2022-06-28")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
@@ -224,8 +227,12 @@ public class NotionServiceImpl implements NotionService {
 
     private Map<String, Object> buildNotionProperties(NotionSyncDto syncData) {
         Map<String, Object> properties = new LinkedHashMap<>();
-        properties.put("ProblemTitle", Map.of("title", List.of(Map.of("type", "text", "text", Map.of("content", syncData.getProblemTitle())))));
-        properties.put("URL", Map.of("url", syncData.getProblemUrl()));
+
+        Map<String, Object> titleText = new HashMap<>();
+        titleText.put("content", syncData.getProblemTitle());
+        titleText.put("link", Map.of("url", syncData.getProblemUrl()));
+        properties.put("ProblemTitle", Map.of("title", List.of(Map.of("type", "text", "text", titleText))));
+
         properties.put("Last Solved", Map.of("date", Map.of("start", syncData.getLastSolved().toString())));
         if (syncData.getNextReview() != null) {
             properties.put("Next Review", Map.of("date", Map.of("start", syncData.getNextReview().toString())));
@@ -247,7 +254,6 @@ public class NotionServiceImpl implements NotionService {
 
         Map<String, Object> properties = new LinkedHashMap<>();
         properties.put("ProblemTitle", Map.of("title", Map.of()));
-        properties.put("URL", Map.of("url", Map.of())); // Add the missing URL property definition
         properties.put("Last Solved", Map.of("date", Map.of()));
         properties.put("Next Review", Map.of("date", Map.of()));
         properties.put("Attempts", Map.of("number", Map.of("format", "number")));
