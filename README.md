@@ -89,21 +89,13 @@ LeetCode의 동적인 UI 환경에서 안정적으로 풀이 성공을 감지하
 
 ## 시작하기
 
-### 1. 백엔드 설정
 
-1.  프로젝트를 클론합니다.
-2.  `src/main/resources/` 경로에 `application.properties` 파일을 생성하고, 아래 내용을 채워넣습니다. (DB 접속 정보, GitHub/Notion OAuth App 키 등)
-3.  PostgreSQL 데이터베이스를 생성하고 `application.properties`에 정보를 입력합니다.
-4.  IntelliJ 또는 터미널에서 Spring Boot 애플리케이션을 실행합니다.
+## 1. 확장 프로그램 다운로드
+이미지를 클릭하여 확장 프로그램 다운 페이지로 이동하여 다운로드 합니다.
+--이미지--
 
-### 2. 프론트엔드 설정
 
-1.  Chrome 브라우저에서 `chrome://extensions`로 이동합니다.
-2.  오른쪽 상단의 '개발자 모드(Developer mode)'를 활성화합니다.
-3.  '압축 해제된 확장 프로그램을 로드합니다(Load unpacked)' 버튼을 클릭합니다.
-4.  이 프로젝트의 `frontend` 폴더를 선택하여 로드합니다.
-
-### 3. 연동 설정
+### 2. 연동 설정
 
 1.  설치된 확장 프로그램 아이콘을 클릭하여 팝업을 엽니다.
 2.  'Login with GitHub' 버튼을 눌러 GitHub 계정을 인증합니다.
