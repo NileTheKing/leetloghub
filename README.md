@@ -63,10 +63,10 @@ LeetLog Hub는 브라우저 확장 프로그램(Frontend)과 Spring Boot 서버(
 
 ### 기술 스택
 
-*   **Backend**: Java 17, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, JJWT
-*   **Frontend**: JavaScript (ES6), HTML, CSS
+*   **Backend**: Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, JJWT, Docker-compose, RESTFUL API
+*   **Frontend**: JS, HTML, CSS
 *   **APIs**: GitHub REST API, Notion API
-*   **Build**: Gradle
+
 
 ## 기술적 핵심 사항
 
