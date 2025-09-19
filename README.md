@@ -16,6 +16,26 @@ LeetLog Hub는 사용자가 LeetCode에서 문제 풀이에 성공했을 때, �
 *   **Notion 연동**: 지정된 Notion 페이지 하위에 풀이 기록 데이터베이스를 생성하고, 문제 풀이 정보를 기반으로 SRS 알고리즘을 적용하여 다음 복습일, 학습 상태 등을 포함한 새로운 페이지를 생성하거나 업데이트합니다.
 *   **안전한 인증**: GitHub/Notion 연동은 OAuth2 표준을 따르며, 백엔드 API와의 통신은 JWT(JSON Web Token)를 사용하여 안전하게 이루어집니다.
 
+## 시작하기
+
+
+## 1. 확장 프로그램 다운로드
+이미지를 클릭하여 확장 프로그램 다운 페이지로 이동하여 다운로드 합니다.
+--이미지--
+
+
+### 2. 연동 설정
+
+1.  설치된 확장 프로그램 아이콘을 클릭하여 팝업을 엽니다.
+2.  'Login with GitHub' 버튼을 눌러 GitHub 계정을 인증합니다.
+3.  자동으로 열리는 설정 페이지(`github-integration.html`)에서 GitHub 레포지토리와 Notion 연동을 순서대로 완료합니다.
+
+### 기술 스택
+
+*   **Backend**: Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, JJWT, Docker-compose, RESTFUL API
+*   **Frontend**: JS, HTML, CSS
+*   **APIs**: GitHub REST API, Notion API
+
 ## 아키텍처
 
 LeetLog Hub는 브라우저 확장 프로그램(Frontend)과 Spring Boot 서버(Backend)로 구성된 클라이언트-서버 아키텍처를 가집니다.
@@ -61,11 +81,6 @@ LeetLog Hub는 브라우저 확장 프로그램(Frontend)과 Spring Boot 서버(
 [사용자 DB, Notion, GitHub]
 ```
 
-### 기술 스택
-
-*   **Backend**: Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, JJWT, Docker-compose, RESTFUL API
-*   **Frontend**: JS, HTML, CSS
-*   **APIs**: GitHub REST API, Notion API
 
 
 ## 기술적 핵심 사항
@@ -87,19 +102,6 @@ LeetCode의 동적인 UI 환경에서 안정적으로 풀이 성공을 감지하
 *   **`interceptor.js` (MAIN)**: 데이터 수집이 완료되면 `window.postMessage()`를 사용해 페이지 내부로 이벤트를 보냅니다.
 *   **`bridge.js` (ISOLATED)**: `window.addEventListener()`로 이벤트를 수신한 뒤, `chrome.runtime.sendMessage()`를 사용해 백그라운드 스크립트로 안전하게 데이터를 전달하는 '다리' 역할을 수행합니다.
 
-## 시작하기
-
-
-## 1. 확장 프로그램 다운로드
-이미지를 클릭하여 확장 프로그램 다운 페이지로 이동하여 다운로드 합니다.
---이미지--
-
-
-### 2. 연동 설정
-
-1.  설치된 확장 프로그램 아이콘을 클릭하여 팝업을 엽니다.
-2.  'Login with GitHub' 버튼을 눌러 GitHub 계정을 인증합니다.
-3.  자동으로 열리는 설정 페이지(`github-integration.html`)에서 GitHub 레포지토리와 Notion 연동을 순서대로 완료합니다.
 
 ## 프로젝트 구조
 
