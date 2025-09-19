@@ -1,4 +1,4 @@
-**_# LeetLog Hub
+# LeetLog Hub
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/NileTheKing/leetloghub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -135,4 +135,4 @@ LeetCode의 동적인 UI 환경에서 안정적으로 풀이 성공을 감지하
 
 *   **풀이 상태(SolveStatus) 선택 UI**: 현재는 풀이 상태가 'GOOD'으로 하드코딩되어 있습니다. 제출 성공 시 작은 팝업이나 UI를 주입하여 사용자가 직접 자신의 풀이 경험(PERFECT, BAD 등)을 선택할 수 있도록 개선이 필요합니다.
 *   **GitHub 파일 업데이트**: 현재는 GitHub에 파일이 없을 때 새로 생성하는 로직만 구현되어 있습니다. 이미 파일이 존재할 경우 덮어쓰거나 업데이트하는 로직(기존 파일의 SHA 값을 이용)을 추가해야 합니다.
-*   **에러 핸들링 고도화**: 네트워크 실패나 API 에러 발생 시, 재시도 로직이나 사용자에게 실패를 명확히 알려주는 UI 피드백을 강화할 수 있습니다._**
+*   **에러 핸들링 고도화**: 네트워크 실패나 API 에러 발생 시, 재시도 로직이나 사용자에게 실패를 명확히 알려주는 UI 피드백을 강화할 수 있습니다.
