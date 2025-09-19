@@ -30,7 +30,7 @@ LeetLog Hub는 사용자가 LeetCode에서 문제 풀이에 성공했을 때, �
 2.  'Login with GitHub' 버튼을 눌러 GitHub 계정을 인증합니다.
 3.  자동으로 열리는 설정 페이지(`github-integration.html`)에서 GitHub 레포지토리와 Notion 연동을 순서대로 완료합니다.
 
-### 기술 스택
+## 기술 스택
 
 *   **Backend**: Spring Boot, Spring Security, Spring Data JPA, PostgreSQL, JJWT, Docker-compose, RESTFUL API
 *   **Frontend**: JS, HTML, CSS
